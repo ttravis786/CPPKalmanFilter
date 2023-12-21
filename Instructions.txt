@@ -1,0 +1,8 @@
+First thing
+
+In Cmake lists you will find set(EIGEN3_DIR /home/tt1020/CPP_LIBS/eigen-3.4.0)
+Change this to your eigen directory
+
+Build will fail with exit code 6.
+In Debug mode you can find where it is failing.
+Currently using some shared and unique pointers. Feel free to set to standard pointers again, don't think it helped anyway. 
