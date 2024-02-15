@@ -24,7 +24,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/tt1020/CPP_LIBS/eigen-3.4.0"/>
+					<Add directory="/home/tt1020/CPPKalmanFilter/cplusdemo/eigen-3.4.0"/>
 					<Add directory="/usr/include/c++/11"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
 					<Add directory="/usr/include/c++/11/backward"/>
@@ -47,7 +47,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/tt1020/CPP_LIBS/eigen-3.4.0"/>
+					<Add directory="/home/tt1020/CPPKalmanFilter/cplusdemo/eigen-3.4.0"/>
 					<Add directory="/usr/include/c++/11"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
 					<Add directory="/usr/include/c++/11/backward"/>

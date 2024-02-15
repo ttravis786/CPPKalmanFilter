@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++-11
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/tt1020/CPP_LIBS/eigen-3.4.0
+CXX_INCLUDES = -I/home/tt1020/CPPKalmanFilter/cplusdemo/eigen-3.4.0
 
 CXX_FLAGS = -g
 

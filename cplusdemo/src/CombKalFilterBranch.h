@@ -8,6 +8,9 @@
 # include <Eigen/Dense>
 #include "CombKalFilter.h"
 #include <memory>
+# include "MathFunctions.h"
+
+struct childData;
 
 struct nextPointData {
     double x;
@@ -20,6 +23,7 @@ struct nextPointData {
     nextPointData(double x, double y, int binX, int binY, Eigen::MatrixXd X, Eigen::MatrixXd P);
 };
 
+
 class CombKalFilter;
 
 class CombKalFilterBranch
@@ -30,7 +34,7 @@ public:
 
     CombKalFilterBranch(Eigen::VectorXd X, Eigen::MatrixXd P, int currBinX, int currBinY, int prevBinX, int prevBinY,
                         std::vector<double> x, std::vector<double> y, CombKalFilterBranch *master, int totalPoints,
-                        std::shared_ptr<CombKalFilter> ckf, int iteration);
+                        CombKalFilter * ckf, int iteration);
 
 //    CombKalFilterBranch(Eigen::VectorXd X, Eigen::MatrixXd P, int currBinX, int currBinY, int prevBinX, int prevBinY,
 //                        std::vector<double> x, std::vector<double> y, int totalPoints, CombKalFilter *ckf,
@@ -45,12 +49,11 @@ public:
     std::vector<double> xPoints;
     std::vector<double> yPoints;
     CombKalFilterBranch  * master;
-    std::vector<CombKalFilterBranch> children;
+    std::vector<CombKalFilterBranch *> children;
     int totalPoints;
-    std::shared_ptr<CombKalFilter> ckf;
+    CombKalFilter * ckf;
     int iteration;
     std::vector<nextPointData> possibleNext;
-
 
 
     CombKalFilterBranch()=default;
@@ -63,10 +66,24 @@ public:
 
     void fullPoints(std::vector<double> *fullXPoints, std::vector<double> *fullYPoints);
 
-    void getBestChild(std::shared_ptr<CombKalFilterBranch> bestchild, double *measure, int *childPoints);
-
     void updateKF(double xP, double yP, Eigen::VectorXd *nX, Eigen::MatrixXd *nP, double *res);
+
+    void getBestChild(std::vector<childData> *bestchildren);
+
+    std::vector<std::array<double, 2>> pointConverter(std::vector<double> *x, std::vector<double> *y);
+
+
+    bool similarity_check(childData &child1, childData &child2);
+
+    bool similarity_check(std::vector<std::array<double, 2>> &child1, std::vector<std::array<double, 2>> &child2);
+
+    bool suitableNextBin(int bin);
+
+    void startChild(std::vector<childData> *bestchildren);
+
+    void deleteBranches();
 };
+
 
 
 #endif //CPLUSDEMO_COMBKALFILTERBRANCH_H

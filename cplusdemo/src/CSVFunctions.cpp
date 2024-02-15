@@ -1,4 +1,5 @@
 //
+//
 // Created by tomtr on 20/12/2023.
 //
 
@@ -13,15 +14,17 @@ void writeCSV(std::string filename, std::vector<std::pair<std::string, std::vect
     // Note that all columns should be the same size
 
     // Create an output filestream object
-    std::ofstream myFile(filename);
-
-    // Send column names to the stream
-    for(int j = 0; j < dataset.size(); ++j)
-    {
-        myFile << dataset.at(j).first;
-        if(j != dataset.size() - 1) myFile << ","; // No comma at end of line
+    std::ofstream myFile(filename, std::ios::app);
+    std::streampos currentPosition = myFile.tellp();
+    if (currentPosition == 0){
+        // Send column names to the stream
+        for(int j = 0; j < dataset.size(); ++j)
+        {
+            myFile << dataset.at(j).first;
+            if(j != dataset.size() - 1) myFile << ","; // No comma at end of line
+        }
+        myFile << "\n";
     }
-    myFile << "\n";
 
     // Send data to the stream
     for(int i = 0; i < dataset.at(0).second.size(); ++i)
@@ -53,14 +56,16 @@ std::vector<std::pair<std::string, std::vector<double>>> readCSV(std::string fil
 
     // Helper vars
     std::string line, colname;
-    int val;
+    double val;
 
     // Read the column names
     if(myFile.good())
     {
         // Extract the first line in the file
         std::getline(myFile, line);
-
+        if (!line.empty() && line[line.size() - 1] == '\r')
+            line.erase(line.size() - 1);
+        //line.erase(line.size() - 1);
         // Create a stringstream from line
         std::stringstream ss(line);
 
@@ -75,6 +80,8 @@ std::vector<std::pair<std::string, std::vector<double>>> readCSV(std::string fil
     // Read data, line by line
     while(std::getline(myFile, line))
     {
+        if (!line.empty() && line[line.size() - 1] == '\r')
+            line.erase(line.size() - 1);
         // Create a stringstream of the current line
         std::stringstream ss(line);
 
@@ -82,14 +89,10 @@ std::vector<std::pair<std::string, std::vector<double>>> readCSV(std::string fil
         int colIdx = 0;
 
         // Extract each integer
-        while(ss >> val){
-
+        while(std::getline(ss, colname, ',')){
             // Add the current integer to the 'colIdx' column's values vector
-            result.at(colIdx).second.push_back(val);
-
+            result.at(colIdx).second.push_back(std::stod(colname));
             // If the next token is a comma, ignore it and move on
-            if(ss.peek() == ',') ss.ignore();
-
             // Increment the column index
             colIdx++;
         }

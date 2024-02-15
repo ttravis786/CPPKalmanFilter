@@ -40,3 +40,24 @@ void linear_regression(Eigen::VectorXd x, Eigen::VectorXd y, int order, double e
     // compute B_Cov
     *BCovMat = *var * (X_T * X).inverse();
 }
+
+// Custom hash function for std::array<double, 2>
+struct ArrayHash {
+    size_t operator()(const std::array<double, 2>& arr) const {
+        // Use a simple hash combining method; you can customize it based on your needs
+        return std::hash<double>()(arr[0]) ^ (std::hash<double>()(arr[1]) << 1);
+    }
+};
+
+int countCommonElements(std::vector<std::array<double, 2>> *arr1,
+                        std::vector<std::array<double, 2>> *arr2) {
+    std::unordered_set<std::array<double, 2>, ArrayHash> set1(arr1->begin(), arr1->end());
+    int commonCount = 0;
+    for (size_t i = 0; i < arr2->size(); ++i) {
+        if (set1.count((*arr2)[i]) > 0) {
+            // Element from the second array found in the first array
+            ++commonCount;
+        }
+    }
+    return commonCount;
+}

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.10)
 project(cplusdemo)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -18,7 +18,7 @@ add_executable(cplusdemo main.cpp
         src/CSVFunctions.h
 )
 
-set(EIGEN3_DIR /home/tt1020/CPP_LIBS/eigen-3.4.0)
+set(EIGEN3_DIR eigen-3.4.0)
 
 include_directories(${EIGEN3_DIR})
 

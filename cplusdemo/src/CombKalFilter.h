@@ -17,10 +17,20 @@
 #include "CombKalFilterBranch.h"
 #include "MathFunctions.h"
 #include "memory"
+#include <unordered_set>
+#include <chrono>
+using namespace std::chrono;
+
 
 
 class CombKalFilterBranch;
 
+struct childData {
+    CombKalFilterBranch *branch;
+    double measure;
+    std::vector<std::array<double, 2>> points;
+    int totalPoints;
+};
 class CombKalFilter
 {
 private:
@@ -28,22 +38,28 @@ public:
     CombKalFilter(
             int maxRange, double binWidth, int minPoints,
             int fitOrder, double RK,
-            std::array<std::array<int, 2>, 2> startRange,
-            double maxRes, int maxIteration);
+            std::vector<std::array<std::array<int, 2>, 2>> startRange,
+            double maxRes, int maxIteration, bool fixedView, bool remove, bool multiple);
 
     int maxRange = 5;
     double binWidth = 0.5;
     int minPoints = 8;
     int fitOrder=  2;
-    std::array<std::array<int, 2>, 2> startRange;
+    std::vector<std::array<std::array<int, 2>, 2>> startRange;
     double RK=pow(0.5,2);
     // unc on y
     double maxRes = 2.0;
     int maxIteration = 10;
+    bool fixedView = true;
     Eigen::MatrixXd F;
     Eigen::MatrixXd H;
     std::array<std::array<std::vector<std::array<double, 2>>, 112>,  112> pointsArray;
     std::array<std::vector<std::vector<std::array<int, 2>>>, 4> nextCellVec;
+    // remove any when finding best child
+    bool remove = false;
+    // able to return multiple when best child
+    bool multiple = false;
+    std::vector<CombKalFilterBranch*> masterBranches;
 
     Eigen::MatrixXd getH(double x);
     int binSelector(double x) const;
@@ -64,16 +80,16 @@ public:
 
     std::array<std::vector<std::vector<std::array<int, 2>>>, 4> getNextCellVec() const;
 
-    std::vector<CombKalFilterBranch> find_tracks();
+    std::pair<std::vector<CombKalFilterBranch>, std::vector<double>> find_tracks();
 
 
     void findSeeds(std::array<double, 2>, int i, int j, std::vector<std::array<double, 2>> *usedPoints,
-                   std::vector<CombKalFilterBranch> *possibleTracks);
+                   std::vector<childData> *possibleTracks);
 
-    std::vector<CombKalFilterBranch>
+    std::vector<childData>
     processSeed(std::vector<double> x, std::vector<double> y, int currBinX, int currBinY, int prevBinX, int prevBinY);
 
-    std::vector<CombKalFilterBranch>
+    std::vector<childData>
     addPoints(std::vector<double> x, std::vector<double> y, int currBinX, int currBinY, int prevBinX, int prevBinY,
               int currentLev);
 
@@ -86,6 +102,36 @@ public:
     bool isin_coords(std::array<double, 2> coord, std::vector<std::array<double, 2>> coordList);
 
     bool isin_coords(double x, double y, std::vector<double> xV, std::vector<double> yV);
+    bool similarity_check(std::vector<std::array<double,2>> &child1,
+            std::vector<std::array<double,2>> &child2);
+
+    std::vector<CombKalFilterBranch> finalMerge(std::vector<childData> &possibleTrackVec);
+
+
+    void finalMerge(std::vector<childData> *possibleTrackVec, std::vector<CombKalFilterBranch> *trackVec);
+
+    void
+    processSeed(std::vector<double> x, std::vector<double> y, int currBinX, int currBinY, int prevBinX, int prevBinY,
+                std::vector<childData> *bestChild);
+
+    void addPoints(std::vector<double> x, std::vector<double> y, int currBinX, int currBinY, int prevBinX, int prevBinY,
+                   int currentLev, std::vector<childData> *possibleSeeds);
+
+    void finalMerge(std::vector<childData> *possibleTrackData, std::vector<CombKalFilterBranch> *possibleTrackVec,
+                    std::vector<CombKalFilterBranch> *trackVec);
+
+    void
+    processSeed(std::vector<double> x, std::vector<double> y, int currBinX, int currBinY, int prevBinX, int prevBinY,
+                std::vector<childData> *bestChildData, std::vector<CombKalFilterBranch> *bestChild);
+
+    void addPoints(std::vector<double> x, std::vector<double> y, int currBinX, int currBinY, int prevBinX, int prevBinY,
+                   int currentLev, std::vector<childData> *possibleSeedsData,
+                   std::vector<CombKalFilterBranch> *possibleSeeds);
+
+    void findSeeds(std::array<double, 2> point, int i, int j, std::vector<std::array<double, 2>> *usedPoints,
+                   std::vector<childData> *possibleTrackData, std::vector<CombKalFilterBranch> *possibleTracks);
+
+    void deleteBranches();
 };
 
 #endif //CPLUSDEMO_COMBKALFILTER_H

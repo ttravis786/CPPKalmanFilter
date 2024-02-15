@@ -10,6 +10,7 @@
 #include <utility>
 #include <stdexcept>
 #include <sstream>
+#include "iostream"
 
 void writeCSV(std::string filename, std::vector<std::pair<std::string, std::vector<double>>> dataset);
 
